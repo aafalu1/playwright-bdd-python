@@ -6,12 +6,11 @@ stages:
   - test
   - report
 
-# Global defaults (Inherited by all jobs unless overridden)
+# Global defaults: Your custom pre-baked image
 default:
   image: registry.gitlab.com/aafalu/behave-playwright-docker-image:latest
 
 variables:
-  # Framework configuration matching config/settings.py (APP_ prefix)
   APP_ENV: "ci"
   APP_BASE_URL: "https://staging.example.com"
   APP_BROWSER: "chromium"
@@ -25,34 +24,17 @@ variables:
   APP_REPORTS_DIR: "reports"
   APP_LOG_LEVEL: "INFO"
 
-before_script:
-  # 1. Automatic pip upgrade on the runner machine
-  - python3 -m pip install --upgrade pip
-  # 2. Always install and upgrade to the latest dependencies from requirements.txt
-  - |
-    if command -v behave >/dev/null 2>&1; then
-      echo "✓ Pre-baked runner image detected. Syncing latest dependencies from requirements.txt..."
-      pip install --upgrade -r requirements.txt
-    else
-      echo "Generic base image detected. Setting up virtualenv..."
-      python3 -m venv .venv
-      source .venv/bin/activate
-      python3 -m pip install --upgrade pip
-      pip install --upgrade -r requirements.txt
-    fi
-
 # ------------------------------------------------------------------------------
-# Test Jobs (Chromium Browser Engine Only)
+# Test Jobs (Executes IMMEDIATELY in ~5 seconds!)
 # ------------------------------------------------------------------------------
 
-# 1. Staging Test Run (Default for MRs and main branch)
+# 1. Staging Test Run
 test:staging:
   stage: test
   variables:
     APP_BASE_URL: "https://staging.example.com"
     APP_BROWSER: "chromium"
   script:
-    - "[ -f .venv/bin/activate ] && source .venv/bin/activate || true"
     - behave -f html-pretty -o reports/report.html -f pretty
   artifacts:
     when: always
@@ -60,15 +42,14 @@ test:staging:
     paths:
       - reports/
     reports:
-      junit: reports/junit.xml # Optional if using junit formatter
+      junit: reports/junit.xml
 
-# 2. Scheduled Regression Suite (Chromium Only - No Firefox or WebKit)
+# 2. Scheduled Regression Suite
 test:scheduled-regression:
   stage: test
   variables:
     APP_BROWSER: "chromium"
   script:
-    - "[ -f .venv/bin/activate ] && source .venv/bin/activate || true"
     - behave -f html-pretty -o reports/regression_report.html -f pretty
   artifacts:
     when: always
@@ -78,7 +59,7 @@ test:scheduled-regression:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
 
-# 3. Production Smoke Test (Manual trigger or specific tags)
+# 3. Production Smoke Test
 test:production:
   stage: test
   variables:
@@ -86,7 +67,6 @@ test:production:
     APP_BASE_URL: "https://example.com"
     APP_LOG_LEVEL: "WARNING"
   script:
-    - "[ -f .venv/bin/activate ] && source .venv/bin/activate || true"
     - behave --tags=@smoke -f html-pretty -o reports/prod_smoke_report.html -f pretty
   artifacts:
     when: always
