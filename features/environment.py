@@ -287,6 +287,21 @@ def after_scenario(context: Any, scenario: Any) -> None:
             except Exception as e:
                 logger.warning(f"Failed to capture fallback scenario screenshot: {e}")
 
+        # Fallback log embed if failure occurred outside after_step
+        if (
+            settings.embed_logs
+            and not getattr(context, "failure_captured", False)
+            and hasattr(context, "scenario_log_capture")
+        ):
+            logs = context.scenario_log_capture.get_logs()
+            if logs.strip():
+                context.embed(
+                    mime_type="text/plain",
+                    data=logs,
+                    caption=f"Scenario Failure Logs: {scenario.name}",
+                    filename=f"{safe_name}_failure.log",
+                )
+
     else:
         logger.info(f"Scenario PASSED: '{scenario.name}'")
 

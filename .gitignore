@@ -6,6 +6,7 @@ __pycache__/
 # Test artifacts and traces
 reports/
 *.zip
+*.output
 
 # Environment & Virtual environments
 .env

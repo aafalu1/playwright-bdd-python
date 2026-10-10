@@ -65,6 +65,36 @@ This framework uses three complementary reporting and diagnostic tools:
 * **Embedded Execution & Browser Console Logs**: Framework execution logs and Playwright browser console output are embedded per-step/scenario with automatic gzip compression for large logs.
 * **Dynamic Environment Metadata**: Injects runtime execution details (Environment, Browser, Headless, Base URL, Timeout) directly into the report summary header.
 
+### 💡 Pro-Tip: The Dual-Formatter Architecture (`html-pretty` + `pretty`)
+
+A common mistake in Behave test suites is running only a single formatter:
+* ⚠️ **Running only `-f html-pretty -o reports/report.html`**: The HTML report is created, but your terminal and GitLab CI console remain **completely silent** while tests are executing. If a step hangs or times out, you have zero visibility into which step is stuck until the whole job finishes.
+* ⚠️ **Running only `-f pretty`**: You see colored step logs in the terminal, but **no HTML file or failure screenshots** are generated for stakeholders, downloads, or pipeline artifacts.
+
+#### The Dual-Formatter Solution:
+Run both formatters simultaneously in a single command:
+```bash
+behave --tags=@smoke -f html-pretty -o reports/report.html -f pretty
+```
+
+| Formatter Option | Output Target | Purpose & Value |
+| :--- | :--- | :--- |
+| **`-f html-pretty -o reports/report.html`** | File (`reports/report.html`) | Generates the rich interactive web dashboard with embedded failure screenshots, traces, and metadata. |
+| **`-f pretty`** | Terminal / Console (`stdout`) | Streams live, color-coded step execution (`Given`, `When`, `Then`), timings, and Python stack traces directly to your screen and GitLab CI console. |
+
+> [!NOTE]
+> **Performance Impact: Negligible (<0.1% overhead)**. In UI automation, 99.9% of test duration is spent waiting on browser network calls and DOM interactions (hundreds of milliseconds). Formatting strings in Python takes less than a millisecond, giving you rich console visibility with zero speed penalty.
+
+#### 🎛️ Clean Executive Dashboard vs. Per-Feature Noise (`behave.ini`)
+In [`behave.ini`](behave.ini), summary cards are configurable:
+* **`global_summary = true`**: Renders the **suite-level aggregate header** at the top showing total Features, Scenarios, and overall duration.
+* **`show_summary = false`**: Hides redundant per-feature metadata cards, keeping reports crisp, clean, and executive-ready.
+
+#### 🐞 VS Code Interactive Debugging (`.vscode/launch.json`)
+During VS Code interactive debugging sessions:
+* No formatter is hardcoded in `.vscode/launch.json`, so Behave automatically defaults to `format = pretty` from `behave.ini`.
+* Combined with `"--no-capture"`, all logs and step progress stream unbuffered straight into VS Code's **Integrated Terminal** as breakpoints are hit, bypassing file generation overhead entirely.
+
 ---
 
 ## 📁 Directory Structure
@@ -375,7 +405,7 @@ stages:
   - test
 
 default:
-  image: mcr.microsoft.com/playwright/python:v1.40.0-jammy
+  image: registry.gitlab.com/aafalu/behave-playwright-docker-image:latest
 
 variables:
   APP_ENV: "ci"
@@ -384,16 +414,10 @@ variables:
   APP_HEADLESS: "true"
   APP_TIMEOUT_MS: "15000"
 
-before_script:
-  - python3 -m venv .venv
-  - source .venv/bin/activate
-  - pip install -r requirements.txt
-
 test:staging:
   stage: test
   script:
-    - source .venv/bin/activate
-    - behave -f html -o reports/report.html -f pretty
+    - behave --tags=@smoke -f html-pretty -o reports/report.html -f pretty
   artifacts:
     when: always
     expire_in: 14 days

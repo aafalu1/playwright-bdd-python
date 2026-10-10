@@ -41,6 +41,22 @@ class ScenarioLogCapture(logging.Handler):
         super().close()
 
 
+_SHARED_FILE_HANDLER: Optional[logging.FileHandler] = None
+
+
+def _get_shared_file_handler(log_level: int, formatter: logging.Formatter) -> logging.FileHandler:
+    """Retrieve or create singleton FileHandler with mode='w' to overwrite test_run.log per test session."""
+    global _SHARED_FILE_HANDLER
+    if _SHARED_FILE_HANDLER is None:
+        os.makedirs(settings.reports_dir, exist_ok=True)
+        log_file_path = os.path.join(settings.reports_dir, "test_run.log")
+        # mode='w' ensures previous test run logs are overwritten, never appended
+        _SHARED_FILE_HANDLER = logging.FileHandler(log_file_path, mode="w", encoding="utf-8")
+        _SHARED_FILE_HANDLER.setLevel(log_level)
+        _SHARED_FILE_HANDLER.setFormatter(formatter)
+    return _SHARED_FILE_HANDLER
+
+
 def get_logger(name: str = "framework") -> logging.Logger:
     """Retrieve or configure a structured logger instance.
     
@@ -66,12 +82,8 @@ def get_logger(name: str = "framework") -> logging.Logger:
         console_handler.setFormatter(formatter)
         logger.addHandler(console_handler)
 
-        # 2. File Handler (saved to reports directory)
-        os.makedirs(settings.reports_dir, exist_ok=True)
-        log_file_path = os.path.join(settings.reports_dir, "test_run.log")
-        file_handler = logging.FileHandler(log_file_path, encoding="utf-8")
-        file_handler.setLevel(log_level)
-        file_handler.setFormatter(formatter)
+        # 2. File Handler (overwrites test_run.log per test run, never appends previous runs)
+        file_handler = _get_shared_file_handler(log_level, formatter)
         logger.addHandler(file_handler)
 
     _LOGGERS[name] = logger
