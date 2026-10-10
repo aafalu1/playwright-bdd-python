@@ -41,8 +41,6 @@ test:staging:
     expire_in: 14 days
     paths:
       - reports/
-    reports:
-      junit: reports/junit.xml
 
 # 2. Scheduled Regression Suite
 test:scheduled-regression:
