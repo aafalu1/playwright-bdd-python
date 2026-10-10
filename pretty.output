@@ -1,5 +1,28 @@
-Feature: Test # features/test_temp.feature:1
+Feature: Checkout Flow with Nested Iframes # features/checkout.feature:1
 
-  Scenario: Test undefined                                      # features/test_temp.feature:2
-    Given this is an undefined step that has no step definition # None
+  @regression
+  Scenario: Pay inside nested iframe and verify order           # features/checkout.feature:3
+    Given I am on the "Add to Cart" page                        # features/steps/common_steps.py:19
+    When I fill the "Card Number" field with "4242424242424242" # features/steps/common_steps.py:45
+    And I fill the "OTP" field with "123456"                    # features/steps/common_steps.py:45
+    And I check the "Terms" checkbox                            # features/steps/common_steps.py:51
+    And After I click the "Add to Cart" button it is disabled   # features/steps/common_steps.py:76
+    Then the "Order Row" label for "A-1001" should be visible   # features/steps/common_steps.py:128
+
+Feature: Multi-Level Nested Iframe Testing # features/nested_frames.feature:1
+
+  @smoke
+  Scenario: Interact with Parent, Child, and Deeply Nested Grandchild Iframes                       # features/nested_frames.feature:3
+    Given I navigate to the "Nested Frames" page                                                    # features/steps/common_steps.py:25
+    Then the "Title" label should have text "Store Checkout"                                        # features/steps/common_steps.py:134
+    When I fill the "Customer" field with "Alice Johnson"                                           # features/steps/common_steps.py:45
+    And I click the "View Policy" button                                                            # features/steps/common_steps.py:33
+    And I fill the "Card Number" field with "4111222233334444"                                      # features/steps/common_steps.py:45
+    And I click the "Validate Card" button                                                          # features/steps/common_steps.py:33
+    And I fill the "Bank Reference" field with "REF-98765"                                          # features/steps/common_steps.py:45
+    And I click the "Initiate Challenge" button                                                     # features/steps/common_steps.py:33
+    And I fill the "OTP" field with "999888"                                                        # features/steps/common_steps.py:45
+    And After I click the "Confirm Payment" button it is disabled                                   # features/steps/common_steps.py:76
+    Then the "Verification Status" label should be visible                                          # features/steps/common_steps.py:122
+    And the "Verification Status" label should have text "Verification Success: Payment Authorized" # features/steps/common_steps.py:134
 
