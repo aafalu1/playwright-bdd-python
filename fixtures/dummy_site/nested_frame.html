@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Level 3 - Nested Frame</title>
+  <style>
+    body { font-family: sans-serif; padding: 10px; background: #e2e3e5; }
+    #status-msg { color: #155724; font-weight: bold; margin-top: 8px; display: none; }
+  </style>
+</head>
+<body>
+  <h4>Level 3: Biometric / OTP (Deeply Nested)</h4>
+  <label for="otp">One-Time Password:</label>
+  <input data-testid="otp-code" id="otp" placeholder="Enter OTP" />
+  <button id="btn-confirm-otp" onclick="confirmPayment()">Confirm Payment</button>
+  <p id="status-msg">Verification Success: Payment Authorized</p>
+
+  <script>
+    function confirmPayment() {
+      document.getElementById('status-msg').style.display = 'block';
+      document.getElementById('btn-confirm-otp').disabled = true;
+    }
+  </script>
+</body>
+</html>

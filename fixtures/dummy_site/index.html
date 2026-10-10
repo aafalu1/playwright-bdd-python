@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Main Application - Level 0</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f0f2f5; }
+    .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    iframe { width: 100%; height: 500px; border: 2px solid #007bff; border-radius: 6px; margin-top: 15px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1 id="main-title">Store Checkout</h1>
+    <label for="fld-customer">Customer Name:</label>
+    <input id="fld-customer" type="text" placeholder="Your Name" />
+    <button id="btn-info">View Policy</button>
+
+    <h3>Embedded Payment Provider:</h3>
+    <iframe id="parent-frame" name="parent-frame" src="parent_frame.html"></iframe>
+  </div>
+</body>
+</html>

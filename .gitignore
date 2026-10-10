@@ -1,0 +1,20 @@
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Test artifacts and traces
+reports/
+*.zip
+
+# Environment & Virtual environments
+.env
+venv/
+.venv/
+env/
+
+# OS and Editor artifacts
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

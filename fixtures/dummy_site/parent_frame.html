@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Level 1 - Payment Gateway Frame</title>
+  <style>
+    body { font-family: sans-serif; padding: 15px; background: #e3f2fd; }
+    iframe { width: 100%; height: 350px; border: 2px solid #28a745; border-radius: 6px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Level 1: Payment Gateway (Parent Frame)</h2>
+  <label for="card-number">Card Number:</label>
+  <input id="card-number" placeholder="Enter 16-digit card" />
+  <button id="btn-validate">Validate Card</button>
+
+  <h4>Level 2 3DS Secure Container:</h4>
+  <iframe id="child-frame" name="child-frame" src="child_frame.html"></iframe>
+</body>
+</html>

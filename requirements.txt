@@ -1,0 +1,6 @@
+behave>=1.2.6
+playwright>=1.40.0
+parse>=1.19.0
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+behave-html-pretty-formatter>=1.16.1
