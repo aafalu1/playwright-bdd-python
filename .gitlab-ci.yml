@@ -3,6 +3,7 @@
 # ==============================================================================
 
 stages:
+  - validate
   - test
   - report
 
@@ -25,7 +26,19 @@ variables:
   APP_LOG_LEVEL: "INFO"
 
 # ------------------------------------------------------------------------------
-# Test Jobs (Executes IMMEDIATELY in ~5 seconds!)
+# 1. Quality Gate: Dry-Run Validation (~1 second - No browsers launched)
+# ------------------------------------------------------------------------------
+validate:dry-run:
+  stage: validate
+  script:
+    - echo "🔍 Validating Gherkin syntax, step mappings, duplicate steps, and missing step definitions..."
+    - behave --dry-run -f pretty
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH'
+
+# ------------------------------------------------------------------------------
+# 2. Test Jobs (Chromium Browser Engine - Only runs if validate passes)
 # ------------------------------------------------------------------------------
 
 # 1. Staging Test Run

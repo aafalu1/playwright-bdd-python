@@ -1,6 +1,5 @@
-Feature: Checkout Flow with Nested Iframes # features/checkout.feature:1
+Feature: Test # features/test_temp.feature:1
 
-  @regression
-  Scenario: Pay inside nested iframe and verify order           # features/checkout.feature:3
-    Given I am on the "Add to Cart" page                        # features/steps/common_steps.py:19
-    When I fill the "Card Number" field with "4242424242424242" # features/steps/common_steps.py:45
+  Scenario: Test undefined                                      # features/test_temp.feature:2
+    Given this is an undefined step that has no step definition # None
+
