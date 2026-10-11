@@ -1,12 +1,17 @@
+import os
 from typing import Any, Dict, Union
 from pages.base_page import BasePage
 from pages.element import Css, Element, FrameSection, Placeholder, Role, TestId
 from pages.page_factory import register_page
 
+FIXTURE_HTML_PATH = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "fixtures", "dummy_site", "cart.html")
+)
+
 
 @register_page("Add to Cart", "Cart")
 class AddToCartPage(BasePage):
-    url_path: str = "/cart"
+    url_path: str = f"file://{FIXTURE_HTML_PATH}"
 
     elements: Dict[str, Union[str, Dict[str, Any], Element]] = {
         "btn_add_to_cart": Role("button", name="Add to cart"),
