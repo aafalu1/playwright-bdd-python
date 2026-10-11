@@ -1,0 +1,50 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  behave-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    # 👈 Add your container image here
+    container:
+      image: ghcr.io/aafalu1/github-ci-playwright-image:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    env:
+      APP_ENV: ci
+      APP_BROWSER: chromium
+      APP_HEADLESS: "true"
+      APP_TIMEOUT_MS: "15000"
+      APP_VIEWPORT_WIDTH: "1920"
+      APP_VIEWPORT_HEIGHT: "1080"
+      APP_BASE_URL: "http://localhost:8080"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # (No setup-python, pip install, or playwright install needed — all pre-baked!)
+
+      - name: Run Behave test suite
+        run: |
+          mkdir -p reports
+          behave -f html-pretty -o reports/report.html -f pretty
+
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: behave-report
+          path: |
+            reports/
+          if-no-files-found: warn
