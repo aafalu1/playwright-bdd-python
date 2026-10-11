@@ -134,7 +134,6 @@ playwright_framework/
 ├── reports/                 # Auto-generated reports (git-ignored)
 │   ├── report.html          # Interactive HTML test report
 │   ├── test_run.log         # Timestamped test execution logs
-│   ├── screenshots/         # Full-page PNG screenshots on failure
 │   └── traces/              # Playwright trace archive zips on failure
 ├── .env.example             # Template for local environment variables
 ├── .gitlab-ci.yml           # GitLab CI/CD pipeline with browser matrix & artifacts
@@ -195,8 +194,9 @@ Configuration is handled by [`config/settings.py`](config/settings.py) using `py
 | `APP_VIEWPORT_HEIGHT`| `720` | `int` | Browser window height |
 | `APP_TRACE_ON_FAILURE`| `true` | `bool` | Record Playwright trace zip on test failure |
 | `APP_SCREENSHOT_ON_FAILURE`| `true` | `bool` | Capture full-page screenshot on failure |
+| `APP_SCREENSHOT_ON_EVERY_STEP` | `false` | `bool` | Capture a full-page screenshot after every executed step; overrides failure-only selection when enabled |
 | `APP_COMPANY_LOGO` | `assets/company_logo.svg` | `str` | Path (SVG, PNG) or URL for company logo on HTML report |
-| `APP_REPORTS_DIR` | `reports` | `str` | Directory to store reports, screenshots, and logs |
+| `APP_REPORTS_DIR` | `reports` | `str` | Directory to store reports and logs |
 | `APP_LOG_LEVEL` | `INFO` | `DEBUG`, `INFO`, `WARNING`, `ERROR` | Framework log verbosity |
 
 ### Setting Up Local Environment
@@ -360,9 +360,11 @@ utils.exceptions.ElementNotFoundError:
 
 ### 2. Automatic Full-Page Screenshots & HTML Embedding
 On step failure, `after_step` in [`features/environment.py`](features/environment.py):
-1. Captures a full-page PNG and saves it to `reports/screenshots/<scenario>_<step>.png`.
-2. Automatically attaches it to the failing step via `context.embed(mime_type="image/png", data=screenshot_path)`.
+1. Captures a full-page PNG.
+2. Embeds it inline in the failing step in `reports/report.html`.
 3. Attaches in-memory Python execution logs and browser console errors directly to the step in `reports/report.html`.
+
+Set `APP_SCREENSHOT_ON_EVERY_STEP=true` to embed a screenshot after every executed step, including passed steps. Leave it `false` (the default) to retain failure-only screenshots.
 
 ### 3. Playwright Traces
 Traces are captured and saved to `reports/traces/<scenario_name>.zip`. To inspect:

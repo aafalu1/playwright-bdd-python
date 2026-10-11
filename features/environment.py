@@ -207,26 +207,35 @@ def after_step(context: Any, step: Any) -> None:
     status_name = getattr(getattr(step, "status", None), "name", str(step.status)).lower()
     is_failed = status_name in ("failed", "error") or Status.has_failed(step.status)
 
-    if not is_failed:
-        return
-
-    context.failure_captured = True
     safe_scenario = _sanitize_name(context.scenario.name if hasattr(context, "scenario") else "scenario")
     safe_step = _sanitize_name(step.name)
-    logger.error(f"Step FAILED: '{step.name}' in scenario '{safe_scenario}'")
 
-    # 1. Capture Full-Page Screenshot & Embed at the failing step
-    if settings.screenshot_on_failure and hasattr(context, "page") and context.page:
+    if is_failed:
+        context.failure_captured = True
+        logger.error(f"Step FAILED: '{step.name}' in scenario '{safe_scenario}'")
+
+    capture_screenshot = settings.screenshot_on_every_step or (
+        settings.screenshot_on_failure and is_failed
+    )
+    if capture_screenshot and hasattr(context, "page") and context.page:
         try:
             png_bytes = context.page.screenshot(full_page=True)
+            caption = (
+                f"Failure Screenshot: {step.name}"
+                if is_failed
+                else f"Step Screenshot: {step.name}"
+            )
             context.embed(
                 mime_type="image/png",
                 data=base64.b64encode(png_bytes).decode("utf-8"),
-                caption=f"Failure Screenshot: {step.name}",
+                caption=caption,
             )
-            logger.info(f"Step failure screenshot embedded: '{step.name}'")
+            logger.info(f"Step screenshot embedded: '{step.name}'")
         except Exception as e:
             logger.warning(f"Failed to capture/embed step screenshot: {e}")
+
+    if not is_failed:
+        return
 
     # 2. Embed Execution Logs accumulated up to the failure point
     if settings.embed_logs and hasattr(context, "scenario_log_capture"):

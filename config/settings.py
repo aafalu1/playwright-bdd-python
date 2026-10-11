@@ -34,6 +34,10 @@ class Settings(BaseSettings):
 
     # Diagnostics & Reporting
     screenshot_on_failure: bool = Field(default=True, description="Capture full-page screenshot on failure")
+    screenshot_on_every_step: bool = Field(
+        default=False,
+        description="Capture a full-page screenshot after every executed step",
+    )
     embed_logs: bool = Field(default=True, description="Embed execution logs in HTML report")
     embed_logs_on_failure_only: bool = Field(default=True, description="Embed execution logs only on failure if True")
     embed_console_logs: bool = Field(default=True, description="Embed browser console logs in HTML report")

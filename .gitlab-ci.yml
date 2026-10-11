@@ -22,6 +22,7 @@ variables:
   APP_VIEWPORT_HEIGHT: "720"
   APP_TRACE_ON_FAILURE: "true"
   APP_SCREENSHOT_ON_FAILURE: "true"
+  APP_SCREENSHOT_ON_EVERY_STEP: "true"
   APP_REPORTS_DIR: "reports"
   APP_LOG_LEVEL: "INFO"
   # default Behave tags to run (can be overridden in specific jobs or GitLab UI)
