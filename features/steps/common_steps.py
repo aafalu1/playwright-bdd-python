@@ -20,6 +20,9 @@ register_type(Etype=parse_etype)
 def step_on_page(context: Any, page_name: str) -> None:
     logger.info(f"Setting current page to: '{page_name}'")
     context.current = context.page_factory.get(page_name)
+    page = getattr(context, "page", None)
+    if page and page.url == "about:blank":
+        context.current.navigate()
 
 
 @given('I navigate to the "{page_name}" page')
